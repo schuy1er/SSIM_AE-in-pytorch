@@ -3,26 +3,21 @@ import os
 import cv2 as cv
 from PIL import Image
 
-def read_img(orfile):
-    img_list = []
-    for filename in os.listdir(orfile):
-        out = Image.fromarray(cv.imread(orfile + '/' + filename))
-        img_list.append(out)
-    return img_list
-
 class Dataset(Dataset):
-    def __init__(self, img_list, transform = None):
-        # self.orfile = orfile
+    def __init__(self, orfile, transform = None):
+        self.orfile = orfile
         self.transform = transform
-        self.pic = []
-        for x in img_list:
-            if self.transform:
-                x = self.transform(x)
-            self.pic.append(x)
+        self.file = []
+        for filename in os.listdir(orfile):
+            self.file.append(filename)
 
     def __len__(self):
-        return len(self.pic)
+        return len(self.file)
 
     def __getitem__(self, index):
+        out = cv.imread(self.orfile + '/' + self.file[index])
         # out = cv.GaussianBlur(out, ksize=(25, 25), sigmaX=0)
-        return self.pic[index]
+        out = Image.fromarray(out)
+        if self.transform:
+            out = self.transform(out)
+            return out
